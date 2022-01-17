@@ -1,0 +1,116 @@
+//&n = la dirección de memoria de n
+//*n = la variable cuya dirección esta almacenada en n
+
+/*
+	1.- Debo cargar las palabras en el primer y segundo árbol
+	2.- Después debo ir comparando las palabras de los dos árboles
+	3.- Ir añadiendo las palabras al tercer árbol empezando por la palabra del árbol mas grande
+*/
+
+#include<conio.h>
+#include<fstream>
+#include<iostream>
+#include<stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct arbolesPalabra{
+	char palabra[30];
+	arbolesPalabra *ramaIz;
+	arbolesPalabra *ramaDe;
+};
+
+struct arbPalFin{
+	char palabra[30];
+	arbPalFin *ramaIz;
+	arbPalFin *ramaDe;
+};
+struct palabraArchBin{
+	char palabra[30];
+};
+
+arbolesPalabra* ingrNodoArb(arbolesPalabra *a,char palabra[30]);
+void inorden(arbolesPalabra *a);
+void continuar();
+using namespace std;
+
+int main(){
+	int opcion;
+	arbolesPalabra *a;
+	a = NULL;
+	char palabra[30];
+	
+    do{
+    	cout<<"\n1.- Ingresar lista de palabras del archivo en el arbol #1\n"<<endl;
+    	cout<<"2.- Mostrar arbol\n"<<endl;
+    	
+    	cout<<"Ingrese la opcion deseada: ";
+		cin>>opcion;
+		switch(opcion){
+	    	case 1:
+	    		a = ingrNodoArb(a,palabra);
+	    	break;
+	    	case 2:
+	    		inorden(a);
+	    	break;
+    	
+    	}
+	}while(opcion != 6);
+    
+    return 0;
+}
+
+arbolesPalabra* ingrNodoArb(arbolesPalabra *a,char palabra[30]){
+	ifstream arch;
+	char palabraArch[30];
+	
+	arch.open("palabras.txt",ios::binary|ios::in);
+	if(arch.fail()){
+		exit(1);
+	}
+	arch.read((char *)(&palabraArch), sizeof(palabraArchBin));
+	cout<<palabraArch;
+	
+	
+	while(!arch.eof()){
+		
+		
+		if(a == NULL){
+			
+			a = new arbolesPalabra;
+			if(!a){
+				cout<<"No hay suficiente memoria";
+				return a;
+			}
+			strcpy(a->palabra, palabraArch);
+			
+			a->ramaIz = NULL;
+			a->ramaDe = NULL;
+		}else if(strcmp(a->palabra,palabraArch) < 0){ //a->dato < n
+			
+			a->ramaDe = ingrNodoArb(a->ramaDe,palabraArch);
+		}else if(strcmp(a->palabra,palabraArch) > 0){ //a->dato > n
+			
+			a->ramaIz = ingrNodoArb(a->ramaIz,palabraArch);
+		}else{
+			cout<<"El elemento ya existe, no puede estar repetido";
+			cin.get();
+		}
+		arch.read((char *)(&palabraArch), sizeof(palabraArchBin));
+		return a;
+		continuar();		
+	}
+}
+void inorden(arbolesPalabra *a){
+	if(a){
+		inorden(a->ramaIz);
+		cout<<a->palabra<<'\t';
+		inorden(a->ramaDe);
+	}
+}
+
+void continuar(){
+	cout<<"\nPresiona una tecla para continuar\n\n";
+	getch();
+}
